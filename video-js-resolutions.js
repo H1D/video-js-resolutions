@@ -271,14 +271,15 @@ videojs.plugin('resolutions', function(options) {
   // @param {Object} singular source:
   // {
   //     "data-default": "true",
-  //    "data-res": "SD",
+  //     "data-res": "SD",
   //     "type": "video/mp4",
   //     "src": "http://some_video_url_sd"
   // }
   player.changeResolution = function(new_source){
+    var self = this;
     // has the exact same source been chosen?
     if (this.cache_.src === new_source.src){
-      this.trigger('resolutionchange');
+      setTimeout( function(){ self.trigger('resolutionchange'); } , 0);
       return this; // basically a no-op
     }
 
@@ -307,7 +308,7 @@ videojs.plugin('resolutions', function(options) {
         this.currentTime(curTime);
       }));
 
-      this.trigger('resolutionchange');
+      setTimeout( function(){ self.trigger('resolutionchange'); } , 0);
 
       if (!remainPaused) {
         this.load();
@@ -355,16 +356,43 @@ videojs.plugin('resolutions', function(options) {
     init: function(player, options) {
       videojs.MenuButton.call(this, player, options);
 
+      this.updateLabel();
+      this.player_.on('resolutionchange', videojs.bind(this, this.updateLabel));
+
       if (this.items.length <= 1) {
         this.hide();
       }
     }
   });
 
+  ResolutionButton.prototype.createEl = function(){
+    var el = vjs.Component.prototype.createEl.call(this, 'div', {
+      className: 'vjs-resolutions-button vjs-menu-button vjs-control',
+      innerHTML: '<div class="vjs-control-content"><span class="vjs-control-text">Resolutions</span></div>'
+    });
+
+    this.labelEl_ = vjs.createEl('div', {
+      className: 'vjs-resolutions-value'
+    });
+
+    el.appendChild(this.labelEl_);
+
+    return el;
+  };
+
   ResolutionButton.prototype.sourceResolutions_;
 
   ResolutionButton.prototype.sourceResolutions = function() {
     return this.sourceResolutions_;
+  };
+
+  ResolutionButton.prototype.updateLabel = function() {
+    var resolutions = this.sourceResolutions();
+    for (var i = 0; i < resolutions.length; i++) {
+      if (resolutions[i].src === this.player().currentSrc()) {
+        this.labelEl_.innerHTML = resolutions[i]['data-res'];
+      }
+    }
   };
 
   ResolutionButton.prototype.onClick = function(e){
@@ -410,8 +438,6 @@ videojs.plugin('resolutions', function(options) {
   });
 
   ResolutionsButton.prototype.kind_ = 'resolutions';
-  ResolutionsButton.prototype.buttonText = 'Resolutions';
-  ResolutionsButton.prototype.className = 'vjs-resolutions-button';
 
   // Add Button to controlBar
   videojs.obj.merge(player.controlBar.options_['children'], {
