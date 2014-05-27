@@ -437,13 +437,6 @@ videojs.plugin('resolutions', function(options) {
     }
   });
 
-  ResolutionsButton.prototype.kind_ = 'resolutions';
-
-  // Add Button to controlBar
-  videojs.obj.merge(player.controlBar.options_['children'], {
-    'resolutionsButton': {}
-  });
-
   // let's get the party started!
   // we have to grab the parsed sources and select the source with our
   // resolution-aware source selector
