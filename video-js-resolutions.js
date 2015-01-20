@@ -39,7 +39,9 @@ videojs.plugin('resolutions', function(options) {
 
       // this may cause flash or the native player to emit errors but
       // they are harmless
-      player.src("");
+      try {
+        player.src("");
+      } catch(e){ }
     },
 
     // it is necessary to remove the sources from the DOM after
