@@ -288,6 +288,7 @@ videojs.plugin('resolutions', function(options) {
     // remember our position and playback state
     var curTime      = this.currentTime();
     var remainPaused = this.paused();
+    var is_initial = !this.tech.src();
 
     // pause playback
     this.pause();
@@ -306,9 +307,11 @@ videojs.plugin('resolutions', function(options) {
 
     // when the technology is re-started, kick off the new stream
     this.ready(function() {
-      this.one('loadeddata', vjs.bind(this, function() {
-        this.currentTime(curTime);
-      }));
+      if (!is_initial) {
+        this.one('loadeddata', vjs.bind(this, function() {
+          this.currentTime(curTime);
+        }));
+      }
 
       setTimeout( function(){ self.trigger('resolutionchange'); } , 0);
 
