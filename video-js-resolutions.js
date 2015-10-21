@@ -9,6 +9,7 @@
 // this to be a big deal for anybody.
 videojs.plugin('resolutions', function(options) {
   var player = this;
+  var vjs = videojs;
 
   // 'reduce' utility method
   // @param {Array} array to iterate over
